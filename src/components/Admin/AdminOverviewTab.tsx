@@ -91,9 +91,9 @@ export const AdminOverviewTab: React.FC<AdminOverviewTabProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={() => onNavigateTab('users')}
-            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-md flex items-center gap-1.5"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-2xl transition-colors cursor-pointer shadow-md flex items-center gap-2 active:scale-95"
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-5 h-5" />
             <span>إدارة المستخدمين ({users.length})</span>
           </button>
         </div>

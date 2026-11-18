@@ -11,5 +11,5 @@ coverage/
 combined_source_code.txt
 data/
 uploads/
-
+.audio_tts_cache/
 

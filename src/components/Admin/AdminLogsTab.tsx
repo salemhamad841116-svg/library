@@ -92,17 +92,17 @@ export const AdminLogsTab: React.FC<AdminLogsTabProps> = ({
 
           <button
             onClick={handleExportLogs}
-            className="flex items-center gap-1 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 rounded-xl font-bold cursor-pointer transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 rounded-2xl text-base font-bold cursor-pointer transition-colors"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Download className="w-5 h-5" />
             <span>تصدير السجلات</span>
           </button>
 
           <button
             onClick={handleClearLogs}
-            className="flex items-center gap-1 px-3 py-2 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-100 rounded-xl font-bold cursor-pointer transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/60 hover:bg-rose-100 rounded-2xl text-base font-bold cursor-pointer transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="w-5 h-5" />
             <span>تفريغ السجل</span>
           </button>
         </div>

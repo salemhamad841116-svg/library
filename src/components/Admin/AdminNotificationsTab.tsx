@@ -75,23 +75,23 @@ export const AdminNotificationsTab: React.FC<AdminNotificationsTabProps> = ({
         <form onSubmit={handleSendNotification} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">عنوان الإشعار</label>
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">عنوان الإشعار</label>
               <input
                 type="text"
                 placeholder="تحديث جديد / تنبيه أمني..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">الفئة المستهدفة</label>
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">الفئة المستهدفة</label>
               <select
                 value={target}
                 onChange={(e) => setTarget(e.target.value as any)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm md:text-base font-medium text-slate-900 dark:text-slate-100"
               >
                 <option value="all">جميع المستخدمين (Broadcast All)</option>
                 <option value="pro">مشتركو باقة Pro فقط</option>
@@ -101,11 +101,11 @@ export const AdminNotificationsTab: React.FC<AdminNotificationsTabProps> = ({
             </div>
 
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">نوع التنبيه</label>
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">نوع التنبيه</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value as any)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm md:text-base font-medium text-slate-900 dark:text-slate-100"
               >
                 <option value="info">معلومة عامة (Info)</option>
                 <option value="warning">تنويه مهم (Warning)</option>
@@ -116,11 +116,11 @@ export const AdminNotificationsTab: React.FC<AdminNotificationsTabProps> = ({
 
           {target === 'specific' && (
             <div>
-              <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">اختر المستخدم المستهدف</label>
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">اختر المستخدم المستهدف</label>
               <select
                 value={targetUserId}
                 onChange={(e) => setTargetUserId(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
                 required
               >
                 <option value="">-- اختر مستخدماً من القائمة --</option>
@@ -134,13 +134,13 @@ export const AdminNotificationsTab: React.FC<AdminNotificationsTabProps> = ({
           )}
 
           <div>
-            <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">نص ومحتوى الإشعار</label>
+            <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">نص ومحتوى الإشعار</label>
             <textarea
               rows={3}
               placeholder="اكتب نص الإشعار هنا..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100"
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
               required
             />
           </div>
@@ -148,9 +148,9 @@ export const AdminNotificationsTab: React.FC<AdminNotificationsTabProps> = ({
           <div className="flex justify-end">
             <button
               type="submit"
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-colors cursor-pointer flex items-center gap-2"
+              className="px-7 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-2xl shadow-xl text-base flex items-center gap-2.5 transition-all cursor-pointer active:scale-95"
             >
-              <Send className="w-4 h-4" />
+              <Send className="w-5 h-5" />
               <span>إرسال الإشعار الآن</span>
             </button>
           </div>

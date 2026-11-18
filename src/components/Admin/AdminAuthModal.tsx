@@ -117,9 +117,9 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
           )}
 
           {step === 'login' ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
+            <form onSubmit={handleLoginSubmit} className="space-y-4">
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5">
+                <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                   البريد الإلكتروني للإدارة
                 </label>
                 <div className="relative">
@@ -127,16 +127,16 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-3 pr-9 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-3 pr-10 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                     placeholder="admin@domain.com"
                     required
                   />
-                  <UserCheck className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
+                  <UserCheck className="w-5 h-5 text-slate-400 absolute right-3 top-3.5" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5">
+                <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                   كلمة المرور المشفرة
                 </label>
                 <div className="relative">
@@ -144,21 +144,21 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-3 pr-9 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-3 pr-10 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                     required
                   />
-                  <Lock className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
+                  <Lock className="w-5 h-5 text-slate-400 absolute right-3 top-3.5" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1.5">
+                <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                   رتبة الصلاحيات المطلوبة (Role)
                 </label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as AdminRole)}
-                  className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-hidden"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-sm md:text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-hidden"
                 >
                   <option value="super_admin">مدير نظام أعلى (Super Admin) - كامل الصلاحيات</option>
                   <option value="admin">مدير عام (Admin)</option>
@@ -171,19 +171,19 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer disabled:opacity-50"
+                  className="w-full py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-base font-bold rounded-2xl flex items-center justify-center gap-2.5 shadow-lg transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <span>المتابعة للتحقق الثنائي 2FA</span>
-                  <ArrowRight className="w-4 h-4 rotate-180" />
+                  <ArrowRight className="w-5 h-5 rotate-180" />
                 </button>
               </div>
             </form>
           ) : (
-            <form onSubmit={handle2FASubmit} className="space-y-4 text-xs">
-              <div className="p-3 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl border border-indigo-200 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 text-center">
+            <form onSubmit={handle2FASubmit} className="space-y-4">
+              <div className="p-4 bg-indigo-50 dark:bg-indigo-950/40 rounded-2xl border border-indigo-200 dark:border-indigo-900/60 text-slate-700 dark:text-slate-300 text-center">
                 <KeyRound className="w-8 h-8 text-indigo-600 dark:text-indigo-400 mx-auto mb-2" />
-                <p className="font-bold">أدخل رمز التحقق الثنائي (2FA)</p>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-base font-bold">أدخل رمز التحقق الثنائي (2FA)</p>
+                <p className="text-xs text-slate-500 mt-1">
                   أرسلنا رمز الأمان إلى تطبيق المصادقة الخاص بك. (الرمز التجريبي: <span className="font-mono font-bold text-indigo-600">123456</span>)
                 </p>
               </div>
@@ -195,7 +195,7 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                   value={twoFactorCode}
                   onChange={(e) => setTwoFactorCode(e.target.value)}
                   placeholder="123456"
-                  className="w-full text-center tracking-widest text-lg font-mono py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                  className="w-full text-center tracking-widest text-xl font-mono py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -203,16 +203,16 @@ export const AdminAuthModal: React.FC<AdminAuthModalProps> = ({
                 <button
                   type="button"
                   onClick={() => setStep('login')}
-                  className="w-1/3 py-2.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 font-semibold rounded-xl transition-colors cursor-pointer"
+                  className="w-1/3 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 text-base font-bold rounded-2xl transition-colors cursor-pointer"
                 >
                   رجوع
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-2/3 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 shadow-md transition-colors cursor-pointer disabled:opacity-50"
+                  className="w-2/3 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-5 h-5" />
                   <span>تأكيد وتسجيل الدخول</span>
                 </button>
               </div>

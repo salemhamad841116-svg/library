@@ -104,7 +104,7 @@ export const AdminSecurityTab: React.FC<AdminSecurityTabProps> = ({ logs }) => {
             <button
               type="button"
               onClick={() => handleEnvChange('production')}
-              className={`flex-1 p-2.5 rounded-xl border text-center font-bold text-xs transition-all cursor-pointer ${
+              className={`flex-1 p-3.5 rounded-2xl border text-center font-bold text-sm md:text-base transition-all cursor-pointer ${
                 currentEnv === 'production'
                   ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500 text-emerald-700 dark:text-emerald-300 shadow-xs'
                   : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100'
@@ -116,7 +116,7 @@ export const AdminSecurityTab: React.FC<AdminSecurityTabProps> = ({ logs }) => {
             <button
               type="button"
               onClick={() => handleEnvChange('staging')}
-              className={`flex-1 p-2.5 rounded-xl border text-center font-bold text-xs transition-all cursor-pointer ${
+              className={`flex-1 p-3.5 rounded-2xl border text-center font-bold text-sm md:text-base transition-all cursor-pointer ${
                 currentEnv === 'staging'
                   ? 'bg-amber-50 dark:bg-amber-950/50 border-amber-500 text-amber-700 dark:text-amber-300 shadow-xs'
                   : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100'

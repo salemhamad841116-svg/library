@@ -98,16 +98,16 @@ export const BotKeysTab: React.FC = () => {
         </div>
         <button
           onClick={fetchSettings}
-          className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors cursor-pointer"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           <span>تحديث</span>
         </button>
       </div>
 
       {statusMsg && (
-        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-sm font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{statusMsg}</span>
         </div>
       )}
@@ -128,9 +128,9 @@ export const BotKeysTab: React.FC = () => {
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-black text-slate-900 dark:text-slate-100">{item.company_name}</span>
+                    <span className="text-base font-black text-slate-900 dark:text-slate-100">{item.company_name}</span>
                     <span
-                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                         item.is_active
                           ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400'
                           : 'bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
@@ -138,19 +138,19 @@ export const BotKeysTab: React.FC = () => {
                     >
                       {item.is_active ? 'نشط ومفعل' : 'معطل مؤقتاً'}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                    <span className="text-xs font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg">
                       {item.env_fallback_name}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{item.service_role}</p>
+                  <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{item.service_role}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleToggle(item.id, item.is_active)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors ${
+                    className={`px-4 py-2.5 rounded-xl text-base font-bold transition-colors cursor-pointer ${
                       item.is_active
-                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200'
+                        ? 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200'
                         : 'bg-indigo-600 text-white hover:bg-indigo-700'
                     }`}
                   >
@@ -167,7 +167,7 @@ export const BotKeysTab: React.FC = () => {
                         setExtraConfigInput(item.extra_config || '');
                       }
                     }}
-                    className="px-3.5 py-1.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 rounded-xl text-xs font-bold transition-colors"
+                    className="px-5 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-700 dark:text-indigo-300 rounded-xl text-base font-bold transition-colors cursor-pointer"
                   >
                     {isEditing ? 'إلغاء' : 'تعديل المفتاح'}
                   </button>
@@ -179,7 +179,7 @@ export const BotKeysTab: React.FC = () => {
                 {isEditing ? (
                   <div className="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-indigo-200 dark:border-indigo-900/60">
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                         أدخل المفتاح السري الجديد (سيتم تشفيره فورياً بمعيار AES-256):
                       </label>
                       <input
@@ -187,12 +187,12 @@ export const BotKeysTab: React.FC = () => {
                         value={plainKeyInput}
                         onChange={(e) => setPlainKeyInput(e.target.value)}
                         placeholder="sk-... أو xi-... أو مفتاح API"
-                        className="w-full px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-mono text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-sm font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                         إعدادات إضافية أو معرف الصوت (Extra Config / Voice ID):
                       </label>
                       <input
@@ -200,33 +200,33 @@ export const BotKeysTab: React.FC = () => {
                         value={extraConfigInput}
                         onChange={(e) => setExtraConfigInput(e.target.value)}
                         placeholder="Voice ID أو Endpoint URL أو إعداد إضافي"
-                        className="w-full px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono text-slate-900 dark:text-slate-100 focus:outline-none"
+                        className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-mono text-slate-900 dark:text-slate-100 focus:outline-none"
                       />
                     </div>
 
                     <div className="flex justify-end gap-2 pt-1">
                       <button
                         onClick={() => setEditingId(null)}
-                        className="px-3 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg"
+                        className="px-5 py-2.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 text-base font-bold rounded-xl cursor-pointer"
                       >
                         إلغاء
                       </button>
                       <button
                         onClick={() => handleSaveKey(item.id)}
                         disabled={isSaving}
-                        className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-sm"
+                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-xl flex items-center gap-2 shadow-md cursor-pointer"
                       >
-                        <Save className="w-3.5 h-3.5" />
+                        <Save className="w-4 h-4" />
                         <span>تشفير وحفظ</span>
                       </button>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center justify-between text-xs font-mono text-slate-500 dark:text-slate-400">
+                  <div className="flex items-center justify-between text-sm font-mono text-slate-500 dark:text-slate-400">
                     <div className="flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                      <span>المفتاح الحالي:</span>
-                      <span className="font-bold tracking-wider text-slate-700 dark:text-slate-300">
+                      <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                      <span className="text-slate-600 dark:text-slate-300 font-sans font-bold">المفتاح الحالي:</span>
+                      <span className="font-bold tracking-wider text-slate-800 dark:text-slate-200">
                         {item.masked_preview || 'غير مضبوط'}
                       </span>
                     </div>

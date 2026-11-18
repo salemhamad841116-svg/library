@@ -116,39 +116,39 @@ export const AdminUIBuilderTab: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleDiscard}
-            className="px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 rounded-xl text-base font-bold transition-colors cursor-pointer"
           >
             تراجع عن المسودة
           </button>
           <button
             onClick={handleSaveDraft}
-            className="px-4 py-2 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 cursor-pointer"
+            className="px-6 py-2.5 bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 dark:hover:bg-indigo-900 text-indigo-700 dark:text-indigo-300 rounded-xl text-base font-bold transition-colors flex items-center gap-2 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-5 h-5" />
             {isSaving ? 'جاري الحفظ...' : 'حفظ كمسودة'}
           </button>
           <button
             onClick={handlePublish}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-bold transition-colors flex items-center gap-2 cursor-pointer shadow-sm shadow-emerald-500/20"
+            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-base font-bold transition-colors flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-500/20"
           >
-            <UploadCloud className="w-4 h-4" />
+            <UploadCloud className="w-5 h-5" />
             نشر التعديلات
           </button>
         </div>
       </div>
 
       {/* Builder Navigation */}
-      <div className="flex items-center gap-1 p-2 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
+      <div className="flex items-center gap-1.5 p-2.5 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 overflow-x-auto no-scrollbar">
         {[
-          { id: 'elements', label: 'عناصر الواجهة', icon: <Layout className="w-4 h-4" /> },
-          { id: 'filters', label: 'إدارة الفلاتر', icon: <Filter className="w-4 h-4" /> },
-          { id: 'preview', label: 'المعاينة', icon: <Eye className="w-4 h-4" /> },
-          { id: 'publish', label: 'إدارة النشر', icon: <UploadCloud className="w-4 h-4" /> },
+          { id: 'elements', label: 'عناصر الواجهة', icon: <Layout className="w-5 h-5" /> },
+          { id: 'filters', label: 'إدارة الفلاتر', icon: <Filter className="w-5 h-5" /> },
+          { id: 'preview', label: 'المعاينة', icon: <Eye className="w-5 h-5" /> },
+          { id: 'publish', label: 'إدارة النشر', icon: <UploadCloud className="w-5 h-5" /> },
         ].map(t => (
           <button
             key={t.id}
             onClick={() => setActiveTab(t.id as TabView)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all cursor-pointer whitespace-nowrap ${
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm md:text-base font-bold transition-all cursor-pointer whitespace-nowrap ${
               activeTab === t.id
                 ? 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'

@@ -121,41 +121,41 @@ export const BotAudioTab: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
-          <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <Volume2 className="w-5 h-5 text-indigo-500" />
             <span>مكتبة الردود والأصوات المباشرة (Voice Library)</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">
             ملفات صوتية مرجعية وردود صوتية مسجلة مسبقاً لاستخدامها في قواعد الردود السريعة أو كمرجع للمحرك الصوتي (TTS Reference Audio).
           </p>
         </div>
         <button
           onClick={fetchFiles}
-          className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors shadow-xs"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>تحديث</span>
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>تحديث الأصوات</span>
         </button>
       </div>
 
       {statusMsg && (
-        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-sm font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-600" />
           <span>{statusMsg}</span>
         </div>
       )}
 
       {/* Upload Box */}
       <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-          <Upload className="w-4 h-4 text-indigo-500" />
+        <h3 className="text-base font-black text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+          <Upload className="w-5 h-5 text-indigo-500" />
           <span>رفع ملف صوتي جديد (MP3 / WAV / OGG / M4A)</span>
         </h3>
 
         <form onSubmit={handleUpload} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                 تسمية الرد أو المعلق (مثلاً: صوت المعلق، ترحيب خاص):
               </label>
               <input
@@ -163,20 +163,20 @@ export const BotAudioTab: React.FC = () => {
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="أدخل اسماً توضيحياً للملف الصوتي..."
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                 اختر الملف الصوتي من جهازك:
               </label>
               <input
                 type="file"
                 accept="audio/*"
                 onChange={handleFileChange}
-                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-indigo-600 file:text-white"
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base text-slate-900 dark:text-slate-100 focus:outline-none file:mr-2 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-600 file:text-white cursor-pointer"
                 required
               />
             </div>
@@ -186,9 +186,9 @@ export const BotAudioTab: React.FC = () => {
             <button
               type="submit"
               disabled={isUploading || !selectedFile}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md transition-colors disabled:opacity-50"
+              className="px-7 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-2xl flex items-center gap-2.5 shadow-lg hover:shadow-indigo-500/30 transition-all cursor-pointer disabled:opacity-50 active:scale-95"
             >
-              <Upload className="w-4 h-4" />
+              <Upload className="w-5 h-5" />
               <span>{isUploading ? 'جاري الرفع والحفظ...' : 'رفع إلى مكتبة الأصوات'}</span>
             </button>
           </div>
@@ -197,8 +197,8 @@ export const BotAudioTab: React.FC = () => {
 
       {/* Files List */}
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800">
-          <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+        <div className="p-5 border-b border-slate-200 dark:border-slate-800">
+          <span className="text-base font-bold text-slate-800 dark:text-slate-200">
             الملفات الصوتية المخزنة ({files.length})
           </span>
         </div>

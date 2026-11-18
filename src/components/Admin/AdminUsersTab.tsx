@@ -458,13 +458,13 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
                 <button
                   type="button"
                   onClick={() => setEditModalUser(null)}
-                  className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-xl"
+                  className="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-base cursor-pointer"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl"
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-base cursor-pointer"
                 >
                   حفظ التعديلات
                 </button>
@@ -482,12 +482,12 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
               <Key className="w-6 h-6" />
               <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">إعادة تعيين كلمة المرور</h3>
             </div>
-            <p className="text-slate-500">
+            <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
               أدخل كلمة مرور جديدة للمستخدم <strong className="text-slate-800 dark:text-slate-200">{passwordModalUser.name}</strong>.
             </p>
 
             {passwordSuccess ? (
-              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-xl font-bold text-center">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 rounded-xl font-bold text-center text-sm">
                 {passwordSuccess}
               </div>
             ) : (
@@ -497,20 +497,20 @@ export const AdminUsersTab: React.FC<AdminUsersTabProps> = ({
                   placeholder="كلمة المرور الجديدة..."
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base text-slate-900 dark:text-slate-100"
                   required
                 />
                 <div className="flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => setPasswordModalUser(null)}
-                    className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-xl"
+                    className="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-base cursor-pointer"
                   >
                     إلغاء
                   </button>
                   <button
                     type="submit"
-                    className="px-4 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl"
+                    className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-base cursor-pointer"
                   >
                     تعيين وتأكيد
                   </button>

@@ -149,41 +149,41 @@ export const BotQaTab: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div>
-          <h2 className="text-lg font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+          <h2 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
             <HelpCircle className="w-5 h-5 text-indigo-500" />
             <span>أسئلة وأجوبة البوت المباشرة (Direct Q&A Rules)</span>
           </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            إجابات فورية ذات أولوية عليا مع إمكانية إرفاق رد صوتي مسجل مسبقاً (Zero LLM Cost & Zero Latency).
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">
+            إجابات فورية ذات أولوية عليا مع إمكانية إرفاق رد صوتي مسجل مسبقاً (Zero LLM Cost &amp; Zero Latency).
           </p>
         </div>
         <button
           onClick={fetchRules}
-          className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors shadow-xs"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>تحديث</span>
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>تحديث القواعد</span>
         </button>
       </div>
 
       {statusMsg && (
-        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-sm font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{statusMsg}</span>
         </div>
       )}
 
       {/* Editor & Creation Form */}
       <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-500" />
+        <h3 className="text-base font-black text-slate-900 dark:text-slate-100 mb-4 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-amber-500" />
           <span>{editingId ? 'تعديل قاعدة السؤال والجواب' : 'إضافة سؤال وجواب مباشر للبوت'}</span>
         </h3>
 
         <form onSubmit={handleSave} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                 صيغة السؤال الشائع أو العبارة المفتاحية:
               </label>
               <input
@@ -191,13 +191,13 @@ export const BotQaTab: React.FC = () => {
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder="مثال: من هو مؤلف كتاب كذا؟ أو ما هي مواعيد العمل؟"
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                 الكلمات المفتاحية المرادفة (مفصولة بفاصلة):
               </label>
               <input
@@ -205,13 +205,13 @@ export const BotQaTab: React.FC = () => {
                 value={keywordsText}
                 onChange={(e) => setKeywordsText(e.target.value)}
                 placeholder="مؤلف، كاتب، صاحب، متى يفتح"
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
               الإجابة النموذجية المعتمدة (النصية):
             </label>
             <textarea
@@ -219,20 +219,20 @@ export const BotQaTab: React.FC = () => {
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder="اكتب الإجابة الدقيقة التي سيعرضها البوت مباشرة للمستخدم..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
+              className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 leading-relaxed"
               required
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                 الرد الصوتي المباشر (اختياري من مكتبة الأصوات):
               </label>
               <select
                 value={selectedAudioId}
                 onChange={(e) => setSelectedAudioId(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none"
               >
                 <option value="">بدون ملف صوتي (توليد TTS ديناميكي)</option>
                 {audioFiles.map((af) => (
@@ -244,13 +244,13 @@ export const BotQaTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">
                 طريقة المطابقة (Match Mode):
               </label>
               <select
                 value={matchMode}
                 onChange={(e) => setMatchMode(e.target.value as any)}
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none"
               >
                 <option value="smart">ذكية (مطابقة النص والكلمات المفتاحية)</option>
                 <option value="exact">تطابق تام حصري (Exact Match)</option>
@@ -260,23 +260,23 @@ export const BotQaTab: React.FC = () => {
 
             <div className="flex items-center gap-4 pt-4 sm:pt-6">
               <div className="flex-1">
-                <label className="block text-[11px] font-bold text-slate-500 mb-1">الأولوية (Priority):</label>
+                <label className="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">الأولوية (Priority):</label>
                 <input
                   type="number"
                   value={priority}
                   onChange={(e) => setPriority(parseInt(e.target.value, 10) || 0)}
-                  className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg text-xs"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium"
                 />
               </div>
 
-              <label className="flex items-center gap-2 cursor-pointer mt-3">
+              <label className="flex items-center gap-2 cursor-pointer mt-4">
                 <input
                   type="checkbox"
                   checked={enabled}
                   onChange={(e) => setEnabled(e.target.checked)}
-                  className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+                  className="w-5 h-5 rounded text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                 />
-                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">مفعلة</span>
+                <span className="text-base font-bold text-slate-800 dark:text-slate-200">مفعلة</span>
               </label>
             </div>
           </div>
@@ -286,7 +286,7 @@ export const BotQaTab: React.FC = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="px-4 py-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-xl transition-colors"
+                className="px-6 py-3 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 text-slate-800 dark:text-slate-200 text-base font-bold rounded-2xl transition-colors cursor-pointer"
               >
                 إلغاء التعديل
               </button>
@@ -295,9 +295,9 @@ export const BotQaTab: React.FC = () => {
             <button
               type="submit"
               disabled={isSaving}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-md transition-colors disabled:opacity-50"
+              className="px-7 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-2xl flex items-center gap-2.5 shadow-lg hover:shadow-indigo-500/30 transition-all cursor-pointer disabled:opacity-50 active:scale-95"
             >
-              <Save className="w-4 h-4" />
+              <Save className="w-5 h-5" />
               <span>{editingId ? 'حفظ التعديلات' : 'إضافة القاعدة للبوت'}</span>
             </button>
           </div>
@@ -305,9 +305,9 @@ export const BotQaTab: React.FC = () => {
       </div>
 
       {/* Test Match Playground */}
-      <div className="p-5 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/20 dark:to-purple-950/20 rounded-3xl border border-indigo-200 dark:border-indigo-900/40">
-        <h4 className="text-xs font-bold text-indigo-900 dark:text-indigo-300 mb-2 flex items-center gap-2">
-          <Search className="w-4 h-4" />
+      <div className="p-6 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/20 dark:to-purple-950/20 rounded-3xl border border-indigo-200 dark:border-indigo-900/40">
+        <h4 className="text-sm font-bold text-indigo-900 dark:text-indigo-300 mb-3 flex items-center gap-2">
+          <Search className="w-5 h-5 text-indigo-500" />
           <span>اختبار مطابقة الأسئلة المباشرة (Test Match Runner)</span>
         </h4>
         <div className="flex gap-2">
@@ -316,15 +316,17 @@ export const BotQaTab: React.FC = () => {
             value={testQuery}
             onChange={(e) => setTestQuery(e.target.value)}
             placeholder="اكتب سؤالاً لتجربة كيف سيطابقه البوت..."
-            className="flex-1 px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-xs"
+            className="flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
             onKeyDown={(e) => e.key === 'Enter' && handleTestMatch()}
           />
           <button
+            type="button"
             onClick={handleTestMatch}
-            disabled={isTesting}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl"
+            disabled={isTesting || !testQuery.trim()}
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold rounded-xl text-base flex items-center gap-2 shadow-md transition-colors cursor-pointer"
           >
-            {isTesting ? 'جاري الفحص...' : 'فحص المطابقة'}
+            {isTesting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4 text-amber-300" />}
+            <span>فحص المطابقة</span>
           </button>
         </div>
 

@@ -72,9 +72,9 @@ export const AdminSubscriptionsTab: React.FC = () => {
             <div className="pt-4">
               <button
                 onClick={() => setEditingPlan(plan)}
-                className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                className="w-full py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-base font-bold rounded-2xl flex items-center justify-center gap-2 transition-colors cursor-pointer"
               >
-                <Edit3 className="w-4 h-4" />
+                <Edit3 className="w-5 h-5" />
                 <span>تعديل حدود الباقة والأسعار</span>
               </button>
             </div>
@@ -90,33 +90,33 @@ export const AdminSubscriptionsTab: React.FC = () => {
 
             <form onSubmit={handleSavePlan} className="space-y-3">
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">السعر الشهري ($)</label>
+                <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">السعر الشهري ($)</label>
                 <input
                   type="number"
                   step="0.01"
                   value={editingPlan.priceMonthly}
                   onChange={(e) => setEditingPlan({ ...editingPlan, priceMonthly: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">السعة التخزينية (MB)</label>
+                <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">السعة التخزينية (MB)</label>
                 <input
                   type="number"
                   value={editingPlan.storageMB}
                   onChange={(e) => setEditingPlan({ ...editingPlan, storageMB: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
                 />
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-slate-300 font-bold mb-1">الحد الأقصى للملاحظات</label>
+                <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-1.5">الحد الأقصى للملاحظات</label>
                 <input
                   type="number"
                   value={editingPlan.maxNotes}
                   onChange={(e) => setEditingPlan({ ...editingPlan, maxNotes: Number(e.target.value) })}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl"
+                  className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100"
                 />
               </div>
 
@@ -124,13 +124,13 @@ export const AdminSubscriptionsTab: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setEditingPlan(null)}
-                  className="px-4 py-2 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-xl"
+                  className="px-5 py-2.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-base cursor-pointer"
                 >
                   إلغاء
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-indigo-600 text-white font-bold rounded-xl"
+                  className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-base cursor-pointer shadow-md"
                 >
                   حفظ التغييرات
                 </button>

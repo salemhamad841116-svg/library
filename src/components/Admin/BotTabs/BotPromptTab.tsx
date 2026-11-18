@@ -62,16 +62,16 @@ export const BotPromptTab: React.FC = () => {
         </div>
         <button
           onClick={fetchSettings}
-          className="flex items-center gap-2 px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-300 transition-colors"
+          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-2xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors cursor-pointer"
         >
-          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           <span>تحديث</span>
         </button>
       </div>
 
       {statusMsg && (
-        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-xs text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
+        <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-sm font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
           <span>{statusMsg}</span>
         </div>
       )}
@@ -79,34 +79,34 @@ export const BotPromptTab: React.FC = () => {
       <form onSubmit={handleSave} className="space-y-6">
         {/* Identity & Welcome Message */}
         <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <MessageSquare className="w-4 h-4 text-indigo-500" />
+          <h3 className="text-base font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-indigo-500" />
             <span>هوية البوت والرسالة الترحيبية</span>
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                 اسم البوت الظاهر للمستخدمين:
               </label>
               <input
                 type="text"
                 value={settings.botName || ''}
                 onChange={(e) => setSettings({ ...settings, botName: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                 رسالة الترحيب التلقائية في الشات:
               </label>
               <input
                 type="text"
                 value={settings.welcomeMessage || ''}
                 onChange={(e) => setSettings({ ...settings, welcomeMessage: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 required
               />
             </div>
@@ -116,14 +116,14 @@ export const BotPromptTab: React.FC = () => {
         {/* System Prompt Editor */}
         <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-indigo-500" />
+            <h3 className="text-base font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-indigo-500" />
               <span>موجه النظام الرئيسي (System Prompt)</span>
             </h3>
-            <span className="text-[11px] text-slate-400">ينفذ على كافة استعلامات الذكاء الاصطناعي</span>
+            <span className="text-xs text-slate-400 font-medium">ينفذ على كافة استعلامات الذكاء الاصطناعي</span>
           </div>
 
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
             حدد قواعد الأسلوب، قيود عدم التأليف، طريقة الاستشهاد بالكتب والملاحظات، وطريقة الترحيب للمتحدثين صوتياً.
           </p>
 
@@ -131,27 +131,27 @@ export const BotPromptTab: React.FC = () => {
             rows={6}
             value={settings.systemPrompt || ''}
             onChange={(e) => setSettings({ ...settings, systemPrompt: e.target.value })}
-            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono leading-relaxed"
+            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-2xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono leading-relaxed"
             required
           />
         </div>
 
         {/* Provider Selection & Models */}
         <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-indigo-500" />
+          <h3 className="text-base font-black text-slate-900 dark:text-slate-100 flex items-center gap-2">
+            <Sliders className="w-5 h-5 text-indigo-500" />
             <span>محرك ومزود الذكاء الاصطناعي النشط</span>
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                 المزود المفضل للشات (Active AI Provider):
               </label>
               <select
                 value={settings.chatProvider || 'auto'}
                 onChange={(e) => setSettings({ ...settings, chatProvider: e.target.value })}
-                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-none"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-medium text-slate-900 dark:text-slate-100 focus:outline-none"
               >
                 <option value="auto">تلقائي (حسب المفاتيح النشطة مع تجاوز الأعطال)</option>
                 <option value="gemini">Google Gemini (الأسرع والأفضل للتفريغ والملاحظات)</option>
@@ -162,7 +162,7 @@ export const BotPromptTab: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label className="block text-sm md:text-base font-bold text-slate-800 dark:text-slate-200 mb-2">
                 درجة الإبداع والحرارة (Temperature: {settings.temperature}):
               </label>
               <div className="flex items-center gap-3 pt-1">
@@ -175,7 +175,7 @@ export const BotPromptTab: React.FC = () => {
                   onChange={(e) => setSettings({ ...settings, temperature: parseFloat(e.target.value) })}
                   className="flex-1 accent-indigo-600"
                 />
-                <span className="font-mono text-xs font-bold text-indigo-600 w-10 text-center">
+                <span className="font-mono text-base font-bold text-indigo-600 w-12 text-center">
                   {settings.temperature}
                 </span>
               </div>
@@ -185,7 +185,7 @@ export const BotPromptTab: React.FC = () => {
           {/* Model Names */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">نموذج Gemini:</label>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">نموذج Gemini:</label>
               <input
                 type="text"
                 value={settings.models?.gemini || 'gemini-3.6-flash'}
@@ -195,12 +195,12 @@ export const BotPromptTab: React.FC = () => {
                     models: { ...settings.models, gemini: e.target.value },
                   })
                 }
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-slate-100"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">نموذج OpenAI:</label>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">نموذج OpenAI:</label>
               <input
                 type="text"
                 value={settings.models?.openai || 'gpt-4o-mini'}
@@ -210,12 +210,12 @@ export const BotPromptTab: React.FC = () => {
                     models: { ...settings.models, openai: e.target.value },
                   })
                 }
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-slate-100"
               />
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">نموذج Anthropic Claude:</label>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">نموذج Anthropic Claude:</label>
               <input
                 type="text"
                 value={settings.models?.anthropic || 'claude-3-5-sonnet-20241022'}
@@ -225,42 +225,42 @@ export const BotPromptTab: React.FC = () => {
                     models: { ...settings.models, anthropic: e.target.value },
                   })
                 }
-                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs font-mono"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-mono text-slate-900 dark:text-slate-100"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t border-slate-100 dark:border-slate-800">
             <div>
-              <label className="block text-[11px] font-bold text-slate-500 mb-1">أقصى مقتطفات من المكتبة:</label>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">أقصى مقتطفات من المكتبة:</label>
               <input
                 type="number"
                 min="1"
                 max="15"
                 value={settings.maxContextNotes || 5}
                 onChange={(e) => setSettings({ ...settings, maxContextNotes: parseInt(e.target.value, 10) || 5 })}
-                className="w-full px-3 py-1.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-xs"
+                className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-bold text-slate-900 dark:text-slate-100"
               />
             </div>
 
-            <label className="flex items-center gap-2 cursor-pointer pt-4">
+            <label className="flex items-center gap-2.5 cursor-pointer pt-3">
               <input
                 type="checkbox"
                 checked={settings.voiceRepliesDefault !== false}
                 onChange={(e) => setSettings({ ...settings, voiceRepliesDefault: e.target.checked })}
-                className="w-4 h-4 rounded text-indigo-600"
+                className="w-5 h-5 rounded text-indigo-600"
               />
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">الردود الصوتية مفعلة افتراضياً</span>
+              <span className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-200">الردود الصوتية مفعلة افتراضياً</span>
             </label>
 
-            <label className="flex items-center gap-2 cursor-pointer pt-4">
+            <label className="flex items-center gap-2.5 cursor-pointer pt-3">
               <input
                 type="checkbox"
                 checked={settings.publicUploadsEnabled !== false}
                 onChange={(e) => setSettings({ ...settings, publicUploadsEnabled: e.target.checked })}
-                className="w-4 h-4 rounded text-indigo-600"
+                className="w-5 h-5 rounded text-indigo-600"
               />
-              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">السماح برفع المستندات والملفات</span>
+              <span className="text-sm md:text-base font-bold text-slate-800 dark:text-slate-200">السماح برفع المستندات والملفات</span>
             </label>
           </div>
         </div>
@@ -269,9 +269,9 @@ export const BotPromptTab: React.FC = () => {
           <button
             type="submit"
             disabled={isSaving}
-            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-2xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all disabled:opacity-50"
+            className="px-7 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white text-base font-bold rounded-2xl flex items-center gap-2.5 shadow-xl shadow-indigo-600/20 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
           >
-            <Save className="w-4 h-4" />
+            <Save className="w-5 h-5" />
             <span>{isSaving ? 'جاري الحفظ...' : 'حفظ تعليمات وإعدادات الذكاء الاصطناعي'}</span>
           </button>
         </div>

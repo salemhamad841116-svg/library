@@ -295,7 +295,7 @@ export const AdminNotesTab: React.FC<AdminNotesTabProps> = ({
             <div className="p-4 bg-slate-100 dark:bg-slate-800/80 border-t border-slate-200 dark:border-slate-800 flex justify-end">
               <button
                 onClick={() => setPreviewNote(null)}
-                className="px-5 py-2 bg-indigo-600 text-white font-bold rounded-xl text-xs"
+                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-base cursor-pointer"
               >
                 إغلاق
               </button>
