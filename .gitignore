@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+.firebase/
+.npm-cache/
+combined_source_code.txt
+data/
+uploads/
+
+

@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Preserve and enforce custom colors in notes content */
+[contenteditable="true"] [style*="color"],
+.prose [style*="color"] {
+  /* Ensure inline font colors take strict precedence */
+}
+
+/* Support legacy font tags if present in pasted HTML */
+font[color] {
+  color: attr(color, color);
+}
+
+/* Ensure clean contrast for highlighted text */
+[contenteditable="true"] mark,
+.prose mark {
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.25rem;
+}

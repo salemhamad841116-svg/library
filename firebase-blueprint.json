@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile document containing authentication email, metadata, device specs, and location info",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique user ID matching request.auth.uid"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address directly extracted from Firebase Auth"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name of the user"
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Avatar image URL"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of account creation"
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "description": "ISO timestamp of last login"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last profile update"
+        },
+        "device_info": {
+          "type": "object",
+          "description": "Hardware, OS, browser, screen resolution, and client environment specs"
+        },
+        "last_login_location": {
+          "type": "object",
+          "description": "Network connection, IP, country, and approximate location"
+        }
+      },
+      "required": ["uid", "email"]
+    },
+    "Note": {
+      "title": "Note",
+      "description": "Infinite hierarchical note document strictly bound to its owning user",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique note document ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Relational binding: UID of the owning user"
+        },
+        "parentId": {
+          "type": "string",
+          "description": "Parent note ID or null for root notes"
+        },
+        "path": {
+          "type": "string",
+          "description": "Hierarchical path in note tree"
+        },
+        "depth": {
+          "type": "number",
+          "description": "Nesting depth level (0, 1, 2...)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Note title"
+        },
+        "content": {
+          "type": "string",
+          "description": "Note content body"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last update"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Tags list"
+        },
+        "color": {
+          "type": "string",
+          "description": "Accent color preset"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Emoji or icon"
+        },
+        "isPinned": {
+          "type": "boolean",
+          "description": "Pinned status"
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "description": "Favorite status"
+        },
+        "isArchived": {
+          "type": "boolean",
+          "description": "Archived status"
+        },
+        "isDeleted": {
+          "type": "boolean",
+          "description": "Soft deleted / trash status"
+        }
+      },
+      "required": ["id", "title"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile with metadata, device info, and silent location details"
+    },
+    "/users/{userId}/user_notes/{noteId}": {
+      "schema": "Note",
+      "description": "User-isolated subcollection containing all infinite nested notes"
+    },
+    "/notes/{noteId}": {
+      "schema": "Note",
+      "description": "Top-level notes collection guarded by userId match"
+    }
+  }
+}

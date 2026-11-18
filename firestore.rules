@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default: Total denial of public unauthenticated read and write operations
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Security Helper functions for strict Row-Level-Security (RLS)
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // 1. User Profile & Metadata Document (Strict isolation by UID)
+    match /users/{userId} {
+      allow get, list: if isOwner(userId);
+      allow create, update: if isOwner(userId) 
+        && request.resource.data.uid == userId;
+      allow delete: if isOwner(userId);
+
+      // 2. Production User-specific E2EE Encrypted Notes Subcollection (Total Isolation)
+      match /user_notes/{noteId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && (request.resource.data.userId == null || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // 3. Staging / Dev isolated notes for development & testing environment
+      match /staging_notes/{noteId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && (request.resource.data.userId == null || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // 4. Production Lists Collection
+      match /user_lists/{listId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && (request.resource.data.userId == null || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId);
+      }
+
+      // 5. Staging Lists Collection
+      match /staging_lists/{listId} {
+        allow get, list: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && (request.resource.data.userId == null || request.resource.data.userId == userId);
+        allow delete: if isOwner(userId);
+      }
+    }
+
+    // 4. Production Top-Level Notes (Guarded strictly by authenticated relational userId)
+    match /notes/{noteId} {
+      allow get: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn() 
+        && resource.data.userId == request.auth.uid 
+        && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // 5. Staging Environment Top-Level Notes
+    match /dev_notes/{noteId} {
+      allow get, list: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // 6. Production Top-Level Lists
+    match /lists/{listId} {
+      allow get, list: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // 7. Staging Environment Top-Level Lists
+    match /dev_lists/{listId} {
+      allow get, list: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}
