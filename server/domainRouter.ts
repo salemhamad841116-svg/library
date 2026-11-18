@@ -25,19 +25,23 @@ export const ADMIN_BOOKS_DOMAINS = (process.env.ADMIN_BOOKS_DOMAIN || 'library.m
   .map((d) => d.trim())
   .filter(Boolean);
 
-export type AppDomainTier = 'bot' | 'library';
+export type AppDomainTier = 'bot' | 'chat' | 'library';
 
 /**
- * Determine the tier (bot or library) based on Host header, query param, or path.
+ * Determine the tier (bot, chat or library) based on Host header, query param, or path.
  */
 export function resolveDomainTier(req: Request): AppDomainTier {
-  // Query param override for testing/local preview: ?app=bot or ?app=library
+  // Query param override for testing/local preview: ?app=bot / ?app=chat / ?app=library
   const appQuery = String(req.query?.app || '').toLowerCase();
   if (appQuery === 'bot') return 'bot';
+  if (appQuery === 'chat') return 'chat';
   if (appQuery === 'library' || appQuery === 'admin') return 'library';
 
   // Path override for local preview: inspect both originalUrl and path
   const fullPath = (req.originalUrl || req.url || req.path || '').toLowerCase().split('?')[0];
+  if (fullPath === '/chat' || fullPath.startsWith('/chat/')) {
+    return 'chat';
+  }
   if (
     fullPath === '/bot' ||
     fullPath.startsWith('/bot/') ||
@@ -51,6 +55,10 @@ export function resolveDomainTier(req: Request): AppDomainTier {
   const rawHost = (req.headers['x-forwarded-host'] || req.headers.host || '').toString().toLowerCase();
   const hostname = rawHost.split(':')[0].trim();
 
+  if (hostname.startsWith('chat.')) {
+    return 'chat';
+  }
+
   if (hostname === BOT_PUBLIC_DOMAIN || hostname.startsWith('bot.')) {
     return 'bot';
   }
@@ -63,14 +71,19 @@ export function resolveDomainTier(req: Request): AppDomainTier {
   return 'library';
 }
 
+/** Public-facing tiers (no admin surface allowed). */
+export function isPublicTier(tier: AppDomainTier): boolean {
+  return tier === 'bot' || tier === 'chat';
+}
+
 /**
- * Middleware that strictly protects against admin leakage on the public bot domain.
- * Any admin route requested on the public bot domain is dropped with 404.
+ * Middleware that strictly protects against admin leakage on the public bot/chat domains.
+ * Any admin route requested on a public domain is dropped with 404.
  */
 export function botDomainSecurityGuard(req: Request, res: Response, next: NextFunction): void {
   const tier = resolveDomainTier(req);
 
-  if (tier === 'bot') {
+  if (isPublicTier(tier)) {
     const isForbiddenAdminRoute =
       req.path.startsWith('/api/admin') ||
       req.path.startsWith('/api/bot/admin') ||

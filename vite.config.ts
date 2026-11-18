@@ -23,6 +23,7 @@ export default defineConfig(() => {
         input: {
           main: path.resolve(__dirname, 'index.html'),
           bot: path.resolve(__dirname, 'bot.html'),
+          chat: path.resolve(__dirname, 'chat.html'),
         },
       },
     },

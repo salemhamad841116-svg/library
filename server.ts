@@ -371,10 +371,10 @@ async function startServer() {
 
       try {
         const tier = resolveDomainTier(req);
-        const htmlFileName = tier === 'bot' ? 'bot.html' : 'index.html';
+        const htmlFileName = tier === 'bot' ? 'bot.html' : tier === 'chat' ? 'chat.html' : 'index.html';
         const htmlPath = path.resolve(process.cwd(), htmlFileName);
         let template = fs.readFileSync(htmlPath, 'utf-8');
-        const transformUrl = tier === 'bot' ? '/bot.html' : req.originalUrl;
+        const transformUrl = tier === 'library' ? req.originalUrl : `/${htmlFileName}`;
         template = await vite.transformIndexHtml(transformUrl, template);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
       } catch (e: any) {
@@ -392,7 +392,7 @@ async function startServer() {
         return;
       }
       const tier = resolveDomainTier(req);
-      const htmlFileName = tier === 'bot' ? 'bot.html' : 'index.html';
+      const htmlFileName = tier === 'bot' ? 'bot.html' : tier === 'chat' ? 'chat.html' : 'index.html';
       const targetFile = path.join(distPath, htmlFileName);
       if (fs.existsSync(targetFile)) {
         res.sendFile(targetFile);
