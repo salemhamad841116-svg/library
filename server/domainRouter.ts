@@ -32,12 +32,18 @@ export type AppDomainTier = 'bot' | 'library';
  */
 export function resolveDomainTier(req: Request): AppDomainTier {
   // Query param override for testing/local preview: ?app=bot or ?app=library
-  const appQuery = String(req.query.app || '').toLowerCase();
+  const appQuery = String(req.query?.app || '').toLowerCase();
   if (appQuery === 'bot') return 'bot';
   if (appQuery === 'library' || appQuery === 'admin') return 'library';
 
-  // Path override for local preview: /bot/*
-  if (req.path === '/bot' || req.path.startsWith('/bot/')) {
+  // Path override for local preview: inspect both originalUrl and path
+  const fullPath = (req.originalUrl || req.url || req.path || '').toLowerCase().split('?')[0];
+  if (
+    fullPath === '/bot' ||
+    fullPath.startsWith('/bot/') ||
+    fullPath === '/voice' ||
+    fullPath.startsWith('/voice/')
+  ) {
     return 'bot';
   }
 
@@ -45,7 +51,7 @@ export function resolveDomainTier(req: Request): AppDomainTier {
   const rawHost = (req.headers['x-forwarded-host'] || req.headers.host || '').toString().toLowerCase();
   const hostname = rawHost.split(':')[0].trim();
 
-  if (hostname === BOT_PUBLIC_DOMAIN) {
+  if (hostname === BOT_PUBLIC_DOMAIN || hostname.startsWith('bot.')) {
     return 'bot';
   }
 

@@ -374,7 +374,8 @@ async function startServer() {
         const htmlFileName = tier === 'bot' ? 'bot.html' : 'index.html';
         const htmlPath = path.resolve(process.cwd(), htmlFileName);
         let template = fs.readFileSync(htmlPath, 'utf-8');
-        template = await vite.transformIndexHtml(req.originalUrl, template);
+        const transformUrl = tier === 'bot' ? '/bot.html' : req.originalUrl;
+        template = await vite.transformIndexHtml(transformUrl, template);
         res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
       } catch (e: any) {
         vite.ssrFixStacktrace(e);
