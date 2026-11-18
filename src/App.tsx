@@ -192,6 +192,19 @@ function NotesApp() {
   const [appMode, setAppMode] = useState<'user' | 'admin'>('user');
   const [isAdminAuthOpen, setIsAdminAuthOpen] = useState(false);
 
+  // Check URL query parameters for direct admin portal access: ?admin=true or ?mode=admin
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('mode') === 'admin' || params.get('admin') === 'true') {
+      const session = getAdminSession();
+      if (session.isAuthenticated) {
+        setAppMode('admin');
+      } else {
+        setIsAdminAuthOpen(true);
+      }
+    }
+  }, []);
+
   // Apply dark mode class to html document element
   useEffect(() => {
     if (isDarkMode) {
