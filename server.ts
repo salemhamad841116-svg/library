@@ -10,6 +10,8 @@ import { resolveDomainTier, botDomainSecurityGuard, BOT_PUBLIC_DOMAIN, ADMIN_BOO
 import { createBotPublicRouter } from './server/bot/publicRouter.js';
 import { createBotAdminRouter, createLibraryPublishRouter } from './server/bot/adminRouter.js';
 import { runIngestionWorker } from './server/bot/ingestion-worker.js';
+import { createInternalSyncRouter } from './server/sync/internalRouter.js';
+import { startWaraqaSyncWorker } from './server/sync/waraqaSync.js';
 
 dotenv.config();
 
@@ -64,6 +66,9 @@ app.use('/api/bot/admin', createBotAdminRouter());
 
 // Real-Time Publish-on-Save Router for Books & Notes
 app.use('/api/library', createLibraryPublishRouter());
+
+// Internal push webhook from masruq_rag_backend (Waraqa) — secret-protected, blocked on public domains
+app.use('/api/internal', createInternalSyncRouter());
 
 // ---------------------------------------------------------------------------
 // 2. Existing Library Endpoints (Email, Health, Geo, Note AI)
@@ -384,7 +389,8 @@ async function startServer() {
     });
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    // index:false so '/' falls through to the tier-aware handler (bot.html on bot.*, chat.html on chat.*)
+    app.use(express.static(distPath, { index: false }));
 
     app.get('*', (req, res, next) => {
       if (req.path.startsWith('/api')) {
@@ -407,6 +413,9 @@ async function startServer() {
     console.log(`   ├─ Public Bot Domain:     http://${BOT_PUBLIC_DOMAIN} (or ?app=bot / /bot)`);
     console.log(`   └─ Admin & Books Domain:  http://${ADMIN_BOOKS_DOMAINS[0]} (index.html)`);
   });
+
+  // Read-only live sync from waraqa.misruq.com (masruq_rag_backend) when WARAQA_DB_PATH is set
+  startWaraqaSyncWorker();
 }
 
 startServer();

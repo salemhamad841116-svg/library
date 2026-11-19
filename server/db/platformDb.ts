@@ -109,6 +109,26 @@ const MIGRATIONS: string[] = [
   );
   CREATE INDEX IF NOT EXISTS idx_library_notes_list ON library_notes(list_id);
   `,
+  // 4. external source tagging (Waraqa sync), precomputed search text, sync state
+  `
+  ALTER TABLE bot_qa_rules ADD COLUMN source TEXT NOT NULL DEFAULT 'local';
+  ALTER TABLE bot_qa_rules ADD COLUMN external_id TEXT;
+  ALTER TABLE library_lists ADD COLUMN source TEXT NOT NULL DEFAULT 'local';
+  ALTER TABLE library_lists ADD COLUMN external_id TEXT;
+  ALTER TABLE library_notes ADD COLUMN source TEXT NOT NULL DEFAULT 'local';
+  ALTER TABLE library_notes ADD COLUMN external_id TEXT;
+  ALTER TABLE library_notes ADD COLUMN search_norm TEXT;
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_qa_source_ext ON bot_qa_rules(source, external_id);
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_lists_source_ext ON library_lists(source, external_id);
+  CREATE INDEX IF NOT EXISTS idx_notes_source_ext ON library_notes(source, external_id);
+  CREATE TABLE IF NOT EXISTS waraqa_sync_state (
+    kind TEXT NOT NULL,
+    external_id TEXT NOT NULL,
+    fingerprint TEXT NOT NULL,
+    synced_at TEXT NOT NULL,
+    PRIMARY KEY (kind, external_id)
+  );
+  `,
 ];
 
 export function getDb(): DatabaseSync {
@@ -130,7 +150,33 @@ export function getDb(): DatabaseSync {
       throw err;
     }
   }
+  backfillSearchNorm(db);
   return db;
+}
+
+/** Fill library_notes.search_norm for rows created before migration 4. */
+function backfillSearchNorm(handle: DatabaseSync): void {
+  const rows = handle
+    .prepare('SELECT id, title, content_text, tags FROM library_notes WHERE search_norm IS NULL')
+    .all() as Array<{ id: string; title: string; content_text: string; tags: string }>;
+  if (rows.length === 0) return;
+  const upd = handle.prepare('UPDATE library_notes SET search_norm = ? WHERE id = ?');
+  handle.exec('BEGIN');
+  try {
+    for (const r of rows) {
+      let tags: string[] = [];
+      try {
+        tags = JSON.parse(r.tags || '[]');
+      } catch {
+        /* ignore */
+      }
+      upd.run(buildSearchNorm(r.title, r.content_text, tags), r.id);
+    }
+    handle.exec('COMMIT');
+  } catch (err) {
+    handle.exec('ROLLBACK');
+    throw err;
+  }
 }
 
 export function closeDb(): void {
@@ -273,8 +319,35 @@ export interface DbQaRule {
   priority: number;
   enabled: boolean;
   hits: number;
+  source?: string;
+  external_id?: string | null;
   created_at: string;
   updated_at: string;
+}
+
+function mapQaRow(r: any): DbQaRule {
+  let keywords: string[] = [];
+  try {
+    keywords = JSON.parse(r.keywords || '[]');
+  } catch {
+    /* ignore malformed keywords */
+  }
+  return {
+    id: r.id,
+    question: r.question,
+    keywords,
+    answer: r.answer,
+    audio_file_id: r.audio_file_id,
+    audio_url: r.audio_file_name ? `/api/bot/audio/${r.audio_file_name}` : null,
+    match_mode: r.match_mode || 'smart',
+    priority: Number(r.priority || 0),
+    enabled: Boolean(r.enabled),
+    hits: Number(r.hits || 0),
+    source: r.source || 'local',
+    external_id: r.external_id ?? null,
+    created_at: r.created_at,
+    updated_at: r.updated_at,
+  };
 }
 
 export function listQaRules(): DbQaRule[] {
@@ -286,21 +359,7 @@ export function listQaRules(): DbQaRule[] {
        ORDER BY r.priority DESC, r.created_at DESC`
     )
     .all() as any[];
-
-  return rows.map((r) => ({
-    id: r.id,
-    question: r.question,
-    keywords: JSON.parse(r.keywords || '[]'),
-    answer: r.answer,
-    audio_file_id: r.audio_file_id,
-    audio_url: r.audio_file_name ? `/api/bot/audio/${r.audio_file_name}` : null,
-    match_mode: r.match_mode || 'smart',
-    priority: Number(r.priority || 0),
-    enabled: Boolean(r.enabled),
-    hits: Number(r.hits || 0),
-    created_at: r.created_at,
-    updated_at: r.updated_at,
-  }));
+  return rows.map(mapQaRow);
 }
 
 export function getQaRule(id: string): DbQaRule | null {
@@ -312,21 +371,7 @@ export function getQaRule(id: string): DbQaRule | null {
        WHERE r.id = ?`
     )
     .get(id) as any;
-  if (!r) return null;
-  return {
-    id: r.id,
-    question: r.question,
-    keywords: JSON.parse(r.keywords || '[]'),
-    answer: r.answer,
-    audio_file_id: r.audio_file_id,
-    audio_url: r.audio_file_name ? `/api/bot/audio/${r.audio_file_name}` : null,
-    match_mode: r.match_mode || 'smart',
-    priority: Number(r.priority || 0),
-    enabled: Boolean(r.enabled),
-    hits: Number(r.hits || 0),
-    created_at: r.created_at,
-    updated_at: r.updated_at,
-  };
+  return r ? mapQaRow(r) : null;
 }
 
 export function saveQaRule(rule: Partial<DbQaRule> & { question: string; answer: string }): DbQaRule {
@@ -337,11 +382,16 @@ export function saveQaRule(rule: Partial<DbQaRule> & { question: string; answer:
   const enabled = rule.enabled !== undefined ? (rule.enabled ? 1 : 0) : 1;
   const matchMode = rule.match_mode || 'smart';
 
+  // INSERT OR REPLACE re-creates the row, so carry over hits/created_at/source/external_id.
   getDb()
     .prepare(
       `INSERT OR REPLACE INTO bot_qa_rules 
-       (id, question, keywords, answer, audio_file_id, match_mode, priority, enabled, hits, created_at, updated_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, COALESCE((SELECT hits FROM bot_qa_rules WHERE id = ?), 0), COALESCE((SELECT created_at FROM bot_qa_rules WHERE id = ?), ?), ?)`
+       (id, question, keywords, answer, audio_file_id, match_mode, priority, enabled, hits, source, external_id, created_at, updated_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?,
+         COALESCE((SELECT hits FROM bot_qa_rules WHERE id = ?), 0),
+         COALESCE(?, (SELECT source FROM bot_qa_rules WHERE id = ?), 'local'),
+         COALESCE(?, (SELECT external_id FROM bot_qa_rules WHERE id = ?)),
+         COALESCE((SELECT created_at FROM bot_qa_rules WHERE id = ?), ?), ?)`
     )
     .run(
       id,
@@ -352,6 +402,10 @@ export function saveQaRule(rule: Partial<DbQaRule> & { question: string; answer:
       matchMode,
       priority,
       enabled,
+      id,
+      rule.source || null,
+      id,
+      rule.external_id || null,
       id,
       id,
       now,
@@ -366,65 +420,180 @@ export function deleteQaRule(id: string): boolean {
   return res.changes > 0;
 }
 
-function normalizeArabicText(text: string): string {
+/**
+ * Arabic-aware normalization used for Q&A matching, duplicate detection and library search.
+ * Removes tashkeel, unifies hamza/ta-marbuta/alef-maqsura, and strips Arabic + Latin punctuation
+ * (including ؟ ، ؛ « ») so "ما هي عاصمة مصر؟" == "ما هي عاصمه مصر".
+ */
+export function normalizeArabicText(text: string): string {
   if (!text) return '';
   return text
     .toLowerCase()
-    .replace(/[\u064B-\u065F\u0670]/g, '') // remove tashkeel
-    .replace(/[أإآ]/g, 'ا')
+    .replace(/[\u064B-\u065F\u0670\u0640]/g, '') // tashkeel + tatweel
+    .replace(/[أإآٱ]/g, 'ا')
     .replace(/ة/g, 'ه')
     .replace(/ى/g, 'ي')
+    .replace(/[\u060C\u061B\u061F\u066A-\u066D\u06D4«»]/g, ' ') // Arabic punctuation
     .replace(/[^\w\s\u0600-\u06FF]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
 }
 
+function buildSearchNorm(title: string, content: string, tags: string[] = []): string {
+  return normalizeArabicText(`${title || ''} ${content || ''} ${tags.join(' ')}`);
+}
+
 /**
  * Match a user question against the Q&A rules table.
- * Returns the highest priority match with its answer and audio url, or null.
+ * Pass 1: exact normalized match on any enabled rule (so a specific rule always wins over a
+ * longer rule that merely contains the query). Pass 2: contains / keyword logic by priority.
  */
 export function matchQaRule(rawQuery: string): DbQaRule | null {
   const clean = normalizeArabicText(rawQuery);
   if (!clean) return null;
 
   const rules = listQaRules().filter((r) => r.enabled);
-  for (const rule of rules) {
-    const qClean = normalizeArabicText(rule.question);
-    let matched = false;
+  const normalized = rules.map((r) => ({ rule: r, q: normalizeArabicText(r.question) }));
 
-    if (rule.match_mode === 'exact') {
-      matched = clean === qClean;
-    } else if (rule.match_mode === 'contains') {
-      matched = clean.includes(qClean) || qClean.includes(clean);
-    } else {
-      // Smart mode: exact match OR contains OR keyword overlap
-      if (clean === qClean || clean.includes(qClean) || qClean.includes(clean)) {
-        matched = true;
-      } else if (rule.keywords.length > 0) {
-        const queryTokens = new Set(clean.split(' '));
-        const matchedKw = rule.keywords.filter((kw) => {
-          const kwClean = normalizeArabicText(kw);
-          return kwClean && (clean.includes(kwClean) || queryTokens.has(kwClean));
-        });
-        if (matchedKw.length > 0) {
+  let found: DbQaRule | null = normalized.find((n) => n.q === clean)?.rule || null;
+
+  if (!found) {
+    for (const { rule, q: qClean } of normalized) {
+      if (!qClean) continue;
+      let matched = false;
+      if (rule.match_mode === 'exact') {
+        matched = false; // exact handled in pass 1
+      } else if (rule.match_mode === 'contains') {
+        matched = clean.includes(qClean) || qClean.includes(clean);
+      } else {
+        if (clean.includes(qClean) || qClean.includes(clean)) {
           matched = true;
+        } else if (rule.keywords.length > 0) {
+          const queryTokens = new Set(clean.split(' '));
+          matched = rule.keywords.some((kw) => {
+            const kwClean = normalizeArabicText(kw);
+            return Boolean(kwClean) && (clean.includes(kwClean) || queryTokens.has(kwClean));
+          });
         }
       }
-    }
-
-    if (matched) {
-      // Increment hit counter asynchronously
-      try {
-        getDb().prepare('UPDATE bot_qa_rules SET hits = hits + 1 WHERE id = ?').run(rule.id);
-        rule.hits += 1;
-      } catch {
-        /* ignore */
+      if (matched) {
+        found = rule;
+        break;
       }
-      return rule;
     }
   }
 
-  return null;
+  if (found) {
+    try {
+      getDb().prepare('UPDATE bot_qa_rules SET hits = hits + 1 WHERE id = ?').run(found.id);
+      found.hits += 1;
+    } catch {
+      /* ignore */
+    }
+  }
+  return found;
+}
+
+// ---------------------------------------------------------------------------
+// Bulk Q&A import (استيراد جماعي)
+// ---------------------------------------------------------------------------
+export interface BulkQaItem {
+  question: string;
+  answer: string;
+  keywords?: string[] | string;
+}
+
+export interface BulkQaResult {
+  importedCount: number;
+  updatedCount: number;
+  skippedCount: number;
+  invalidCount: number;
+  totalRules: number;
+}
+
+function toKeywordArray(kw: unknown): string[] {
+  if (Array.isArray(kw)) return kw.map((k) => String(k).trim()).filter(Boolean);
+  if (typeof kw === 'string') return kw.split(/[,،\n]+/).map((k) => k.trim()).filter(Boolean);
+  return [];
+}
+
+/**
+ * Import many Q&A pairs in ONE atomic transaction.
+ * Duplicates are detected on the normalized question text (against existing rules and within the batch).
+ * mode 'upsert' updates the existing answer (and keywords when supplied); 'skip' leaves it untouched.
+ */
+export function bulkImportQaRules(items: BulkQaItem[], mode: 'upsert' | 'skip' = 'upsert'): BulkQaResult {
+  const d = getDb();
+  const existing = d.prepare('SELECT id, question FROM bot_qa_rules').all() as Array<{ id: string; question: string }>;
+  const byNorm = new Map<string, string>();
+  for (const r of existing) {
+    const n = normalizeArabicText(r.question);
+    if (n && !byNorm.has(n)) byNorm.set(n, r.id);
+  }
+
+  const result: BulkQaResult = { importedCount: 0, updatedCount: 0, skippedCount: 0, invalidCount: 0, totalRules: 0 };
+  const now = new Date().toISOString();
+  const ins = d.prepare(
+    `INSERT INTO bot_qa_rules (id, question, keywords, answer, audio_file_id, match_mode, priority, enabled, hits, source, external_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, NULL, 'smart', 0, 1, 0, 'bulk_import', NULL, ?, ?)`
+  );
+  const updWithKw = d.prepare('UPDATE bot_qa_rules SET answer = ?, keywords = ?, updated_at = ? WHERE id = ?');
+  const updAnswer = d.prepare('UPDATE bot_qa_rules SET answer = ?, updated_at = ? WHERE id = ?');
+
+  transaction(() => {
+    items.forEach((item, i) => {
+      const question = typeof item?.question === 'string' ? item.question.trim() : '';
+      const answer = typeof item?.answer === 'string' ? item.answer.trim() : '';
+      const norm = normalizeArabicText(question);
+      if (!question || !answer || !norm) {
+        result.invalidCount++;
+        return;
+      }
+      const keywords = toKeywordArray(item.keywords);
+      const existingId = byNorm.get(norm);
+      if (existingId) {
+        if (mode === 'skip') {
+          result.skippedCount++;
+          return;
+        }
+        if (keywords.length > 0) updWithKw.run(answer, JSON.stringify(keywords), now, existingId);
+        else updAnswer.run(answer, now, existingId);
+        result.updatedCount++;
+        return;
+      }
+      const id = `qa-${Date.now()}-${i}-${Math.random().toString(36).slice(2, 6)}`;
+      ins.run(id, question, JSON.stringify(keywords), answer, now, now);
+      byNorm.set(norm, id);
+      result.importedCount++;
+    });
+  });
+
+  result.totalRules = Number((d.prepare('SELECT COUNT(*) AS c FROM bot_qa_rules').get() as any)?.c || 0);
+  return result;
+}
+
+/** Upsert a Q&A rule owned by an external source (e.g. Waraqa), keyed by (source, external_id). */
+export function upsertExternalQaRule(
+  source: string,
+  externalId: string,
+  data: { question: string; answer: string; keywords?: string[] }
+): void {
+  const now = new Date().toISOString();
+  const id = `${source}-qa-${externalId}`.slice(0, 200);
+  getDb()
+    .prepare(
+      `INSERT INTO bot_qa_rules (id, question, keywords, answer, audio_file_id, match_mode, priority, enabled, hits, source, external_id, created_at, updated_at)
+       VALUES (?, ?, ?, ?, NULL, 'smart', 0, 1, 0, ?, ?, ?, ?)
+       ON CONFLICT(source, external_id) DO UPDATE SET
+         question = excluded.question, keywords = excluded.keywords, answer = excluded.answer, updated_at = excluded.updated_at`
+    )
+    .run(id, data.question.trim(), JSON.stringify(data.keywords || []), data.answer.trim(), source, externalId, now, now);
+}
+
+export function deleteExternalQaRule(source: string, externalId: string): number {
+  return Number(
+    getDb().prepare('DELETE FROM bot_qa_rules WHERE source = ? AND external_id = ?').run(source, externalId).changes || 0
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -535,6 +704,8 @@ export interface PublishedList {
   sort_order: number;
   is_archived: boolean;
   bot_visible: boolean;
+  source?: string;
+  external_id?: string | null;
   updated_at: string;
   published_at: string;
 }
@@ -549,6 +720,8 @@ export interface PublishedNote {
   tags: string[];
   is_pinned: boolean;
   search_text: string;
+  source?: string;
+  external_id?: string | null;
   updated_at: string;
   published_at: string;
 }
@@ -558,8 +731,8 @@ export function upsertPublishedList(list: Partial<PublishedList> & { id: string;
   getDb()
     .prepare(
       `INSERT OR REPLACE INTO library_lists 
-       (id, owner_uid, name, icon, color, parent_id, sort_order, is_archived, bot_visible, updated_at, published_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       (id, owner_uid, name, icon, color, parent_id, sort_order, is_archived, bot_visible, source, external_id, updated_at, published_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       list.id,
@@ -571,6 +744,8 @@ export function upsertPublishedList(list: Partial<PublishedList> & { id: string;
       list.sort_order || 0,
       list.is_archived ? 1 : 0,
       list.bot_visible !== false ? 1 : 0,
+      list.source || 'local',
+      list.external_id || null,
       list.updated_at || now,
       now
     );
@@ -595,8 +770,8 @@ export function upsertPublishedNote(note: Partial<PublishedNote> & { id: string;
   getDb()
     .prepare(
       `INSERT OR REPLACE INTO library_notes 
-       (id, owner_uid, list_id, parent_id, title, content_text, tags, is_pinned, search_text, updated_at, published_at) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       (id, owner_uid, list_id, parent_id, title, content_text, tags, is_pinned, search_text, search_norm, source, external_id, updated_at, published_at) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
       note.id,
@@ -608,9 +783,35 @@ export function upsertPublishedNote(note: Partial<PublishedNote> & { id: string;
       JSON.stringify(tags),
       note.is_pinned ? 1 : 0,
       searchText,
+      buildSearchNorm(note.title, plainContent, tags),
+      note.source || 'local',
+      note.external_id || null,
       note.updated_at || now,
       now
     );
+}
+
+/** Remove every published note owned by an external record (e.g. all sections of one Waraqa book). */
+export function deleteExternalNotes(source: string, externalId: string): number {
+  return Number(
+    getDb().prepare('DELETE FROM library_notes WHERE source = ? AND external_id = ?').run(source, externalId).changes || 0
+  );
+}
+
+export function deleteExternalList(source: string, externalId: string): number {
+  return Number(
+    getDb().prepare('DELETE FROM library_lists WHERE source = ? AND external_id = ?').run(source, externalId).changes || 0
+  );
+}
+
+export function getExternalSourceStats(source: string): { lists: number; books: number; sections: number; qa: number } {
+  const d = getDb();
+  const l = d.prepare('SELECT COUNT(*) AS c FROM library_lists WHERE source = ?').get(source) as any;
+  const n = d
+    .prepare('SELECT COUNT(*) AS c, COUNT(DISTINCT external_id) AS b FROM library_notes WHERE source = ?')
+    .get(source) as any;
+  const q = d.prepare('SELECT COUNT(*) AS c FROM bot_qa_rules WHERE source = ?').get(source) as any;
+  return { lists: Number(l?.c || 0), books: Number(n?.b || 0), sections: Number(n?.c || 0), qa: Number(q?.c || 0) };
 }
 
 export function deletePublishedNote(id: string): void {
@@ -646,58 +847,94 @@ export interface LibrarySearchResult {
   relevance: number;
 }
 
+// Very common Arabic question/function words (already normalized). Used only to narrow the SQL
+// pre-filter, so a query like "ما هي عاصمة مصر" does not scan every note just because of "ما"/"هي".
+const SEARCH_STOPWORDS = new Set([
+  'ما', 'ماذا', 'هي', 'هو', 'هل', 'في', 'من', 'على', 'عن', 'الي', 'الى', 'كيف', 'لماذا', 'متي', 'اين', 'كم',
+  'او', 'ثم', 'ان', 'لا', 'لم', 'لن', 'مع', 'هذا', 'هذه', 'ذلك', 'تلك', 'التي', 'الذي', 'يا', 'قد', 'كان', 'بين',
+]);
+
 export function searchPublishedLibrary(query: string, limit = 5): LibrarySearchResult[] {
   const clean = normalizeArabicText(query);
   if (!clean) return [];
 
   const tokens = clean.split(' ').filter((t) => t.length > 1);
   if (tokens.length === 0) return [];
+  const significant = tokens.filter((t) => !SEARCH_STOPWORDS.has(t));
+  const filterTokens = (significant.length > 0 ? significant : tokens).slice(0, 12);
+
+  const d = getDb();
+  // Lists whose (normalized) name matches a token also contribute their notes.
+  const lists = d.prepare('SELECT id, name FROM library_lists').all() as Array<{ id: string; name: string }>;
+  const matchingListIds = lists
+    .filter((l) => {
+      const n = normalizeArabicText(l.name);
+      return filterTokens.some((t) => n.includes(t));
+    })
+    .map((l) => l.id);
+
+  // SQL pre-filter on the precomputed normalized text (fast C-level LIKE scan).
+  const likeClauses = filterTokens.map(() => "COALESCE(n.search_norm, '') LIKE ?");
+  const params: string[] = filterTokens.map((t) => `%${t.replace(/[%_]/g, '')}%`);
+  if (matchingListIds.length > 0) {
+    likeClauses.push(`n.list_id IN (${matchingListIds.map(() => '?').join(',')})`);
+    params.push(...matchingListIds);
+  }
 
   // Notes must be in visible lists (or not assigned to a list)
-  const rows = getDb()
+  const rows = d
     .prepare(
-      `SELECT n.id, n.title, n.content_text, n.tags, n.search_text, l.name as list_name 
+      `SELECT n.id, n.title, n.content_text, n.tags, n.search_norm, l.name as list_name 
        FROM library_notes n 
        LEFT JOIN library_lists l ON n.list_id = l.id 
        WHERE (l.bot_visible IS NULL OR l.bot_visible = 1) 
-         AND (l.is_archived IS NULL OR l.is_archived = 0)`
+         AND (l.is_archived IS NULL OR l.is_archived = 0)
+         AND (${likeClauses.join(' OR ')})`
     )
-    .all() as any[];
+    .all(...params) as any[];
 
   const scored: LibrarySearchResult[] = [];
 
   for (const row of rows) {
     const titleNorm = normalizeArabicText(row.title);
-    const contentNorm = normalizeArabicText(row.content_text);
+    const bodyNorm: string = row.search_norm || normalizeArabicText(row.content_text);
     const listNorm = normalizeArabicText(row.list_name || '');
     let score = 0;
 
     if (titleNorm.includes(clean)) score += 10;
-    if (contentNorm.includes(clean)) score += 5;
+    if (bodyNorm.includes(clean)) score += 5;
 
     for (const t of tokens) {
-      if (titleNorm.includes(t)) score += 3;
-      if (listNorm.includes(t)) score += 2;
-      if (contentNorm.includes(t)) score += 1;
+      const weight = SEARCH_STOPWORDS.has(t) ? 0.25 : 1;
+      if (titleNorm.includes(t)) score += 3 * weight;
+      if (listNorm.includes(t)) score += 2 * weight;
+      if (bodyNorm.includes(t)) score += 1 * weight;
     }
 
     if (score > 0) {
-      // Extract a 250-character snippet around first match
-      let snippet = row.content_text || '';
-      const idx = contentNorm.indexOf(tokens[0]);
-      if (idx > 0 && snippet.length > 250) {
-        const start = Math.max(0, idx - 40);
-        snippet = (start > 0 ? '...' : '') + snippet.slice(start, start + 250) + '...';
-      } else if (snippet.length > 250) {
-        snippet = snippet.slice(0, 250) + '...';
+      // Extract a ~400-character snippet around the first significant match
+      let snippet: string = row.content_text || '';
+      if (snippet.length > 400) {
+        const contentNorm = normalizeArabicText(snippet);
+        const idx = contentNorm.indexOf(filterTokens[0]);
+        const ratio = contentNorm.length > 0 ? snippet.length / contentNorm.length : 1;
+        const approx = idx > 0 ? Math.floor(idx * ratio) : 0;
+        const start = Math.max(0, approx - 60);
+        snippet = (start > 0 ? '...' : '') + snippet.slice(start, start + 400) + '...';
       }
 
+      let tags: string[] = [];
+      try {
+        tags = JSON.parse(row.tags || '[]');
+      } catch {
+        /* ignore */
+      }
       scored.push({
         id: row.id,
         title: row.title,
         snippet,
         listName: row.list_name || undefined,
-        tags: JSON.parse(row.tags || '[]'),
+        tags,
         relevance: score,
       });
     }

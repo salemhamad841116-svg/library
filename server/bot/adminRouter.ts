@@ -31,9 +31,11 @@ import {
   deletePublishedNote,
   getPublishedStats,
   clearPublishedLibrary,
+  bulkImportQaRules,
 } from '../db/platformDb.js';
 import { dbService } from './database-service.js';
 import { createBotLegacyRouter } from './legacyRouter.js';
+import { getWaraqaSyncStatus, runWaraqaSync } from '../sync/waraqaSync.js';
 
 export function createBotAdminRouter(): express.Router {
   const router = express.Router();
@@ -81,6 +83,38 @@ export function createBotAdminRouter(): express.Router {
       matched: Boolean(matched),
       rule: matched,
     });
+  });
+
+  // Bulk JSON import (استيراد جماعي) — one atomic SQLite transaction
+  router.post('/qa/bulk', (req: Request, res: Response) => {
+    try {
+      const { items, mode } = req.body || {};
+      if (!Array.isArray(items) || items.length === 0) {
+        res.status(400).json({ success: false, error: 'يجب إرسال قائمة items تحتوي على سؤال وجواب واحد على الأقل.' });
+        return;
+      }
+      if (items.length > 5000) {
+        res.status(413).json({ success: false, error: 'الحد الأقصى 5000 سؤال وجواب في عملية الاستيراد الواحدة.' });
+        return;
+      }
+      const importMode: 'upsert' | 'skip' = mode === 'skip' ? 'skip' : 'upsert';
+      const result = bulkImportQaRules(items, importMode);
+      res.json({ success: true, mode: importMode, ...result });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err.message });
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // 1b. Waraqa live sync (مزامنة من ورقة)
+  // -------------------------------------------------------------------------
+  router.get('/waraqa-sync/status', (req: Request, res: Response) => {
+    res.json({ success: true, status: getWaraqaSyncStatus() });
+  });
+
+  router.post('/sync-waraqa', async (req: Request, res: Response) => {
+    const status = await runWaraqaSync('admin');
+    res.status(status.configured ? 200 : 400).json({ success: status.configured && !status.lastError, status });
   });
 
   // -------------------------------------------------------------------------

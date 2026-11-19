@@ -1,0 +1,66 @@
+version: '3.8'
+
+# ==============================================================================
+# Production Docker Compose for Unified Library, Admin & Public Bot Platform
+# Connects seamlessly to existing Waraqa RAG Backend (masruq_enterprise_network)
+# ==============================================================================
+
+services:
+  library-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: masruq_library_bot
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3002
+      - PLATFORM_DATA_DIR=/app/data
+      - BOT_PUBLIC_DOMAIN=${BOT_PUBLIC_DOMAIN:-bot.misruq.com}
+      - ADMIN_BOOKS_DOMAIN=${ADMIN_BOOKS_DOMAIN:-library.misruq.com,library-mgt.misruq.com}
+      # Read-only path to Waraqa RAG backend SQLite database
+      - WARAQA_DB_PATH=/mnt/waraqa/platform.db
+      - WARAQA_SYNC_INTERVAL_MS=15000
+      - WARAQA_SYNC_SECRET=${WARAQA_SYNC_SECRET:-}
+    volumes:
+      # Persistent SQLite platform.db, audio files, and uploaded media
+      - library_platform_data:/app/data
+      # Mount Waraqa's production data vault strictly READ-ONLY (:ro)
+      - masruq_rag_production_vault_data:/mnt/waraqa:ro
+    networks:
+      masruq_network:
+        aliases:
+          - masruq_library_bot
+          - library-bot
+          - bot-backend
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3002/api/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))\""]
+      interval: 20s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+# ------------------------------------------------------------------------------
+# Persistent Storage Volumes
+# ------------------------------------------------------------------------------
+volumes:
+  # Local persistent volume for the Library & Bot platform
+  library_platform_data:
+    name: masruq_library_platform_data
+    driver: local
+
+  # Existing external volume from Waraqa (masruq_rag_backend)
+  masruq_rag_production_vault_data:
+    external: true
+
+# ------------------------------------------------------------------------------
+# Existing External Docker Network (shared with masruq_gateway_proxy & rag_backend)
+# ------------------------------------------------------------------------------
+networks:
+  masruq_network:
+    name: masruq_enterprise_network
+    external: true

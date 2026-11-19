@@ -87,6 +87,7 @@ export function botDomainSecurityGuard(req: Request, res: Response, next: NextFu
     const isForbiddenAdminRoute =
       req.path.startsWith('/api/admin') ||
       req.path.startsWith('/api/bot/admin') ||
+      req.path.startsWith('/api/internal') ||
       (req.path.startsWith('/api/library') && req.method !== 'GET');
 
     if (isForbiddenAdminRoute) {

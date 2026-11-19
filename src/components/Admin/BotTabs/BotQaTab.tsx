@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit3, Volume2, CheckCircle2, Play, Search, AlertCircle, HelpCircle, Save, Sparkles, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit3, Volume2, CheckCircle2, Play, Search, AlertCircle, HelpCircle, Save, Sparkles, RefreshCw, Upload, Download, Database } from 'lucide-react';
 import { safeFetchJson, adminFetch } from '../../../admin/bot/lib/safeFetch';
+import { BotQaBulkImportModal } from './BotQaBulkImportModal';
+import { buildQaExport } from './qaImportParser';
 
 interface QaRule {
   id: string;
@@ -40,6 +42,7 @@ export const BotQaTab: React.FC = () => {
   const [enabled, setEnabled] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
 
   // Test Match State
   const [testQuery, setTestQuery] = useState('');
@@ -54,6 +57,30 @@ export const BotQaTab: React.FC = () => {
     const aData = await safeFetchJson('/api/bot/admin/audio-files');
     if (aData?.files) setAudioFiles(aData.files);
     setIsLoading(false);
+  };
+
+  const handleExportJson = () => {
+    if (rules.length === 0) {
+      alert('لا توجد أي قواعد محفوظة لتصديرها حالياً.');
+      return;
+    }
+    const jsonStr = buildQaExport(rules);
+    const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const dateStr = new Date().toISOString().split('T')[0];
+    link.download = `bot-qa-rules-${dateStr}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleBulkSuccess = (result: { importedCount: number; updatedCount: number; skippedCount: number; totalRules: number }) => {
+    setStatusMsg(`تمت عملية الاستيراد بنجاح! تم استيراد ${result.importedCount} قاعدة جديدة، وتحديث ${result.updatedCount}، وتخطي ${result.skippedCount}.`);
+    fetchRules();
+    setTimeout(() => setStatusMsg(null), 5000);
   };
 
   useEffect(() => {
@@ -157,14 +184,41 @@ export const BotQaTab: React.FC = () => {
             إجابات فورية ذات أولوية عليا مع إمكانية إرفاق رد صوتي مسجل مسبقاً (Zero LLM Cost &amp; Zero Latency).
           </p>
         </div>
-        <button
-          onClick={fetchRules}
-          className="flex items-center gap-2 px-5 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors shadow-xs"
-        >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span>تحديث القواعد</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsBulkModalOpen(true)}
+            className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-base font-bold shadow-md shadow-indigo-600/20 transition-all cursor-pointer active:scale-95"
+          >
+            <Upload className="w-5 h-5" />
+            <span>استيراد جماعي (JSON)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleExportJson}
+            className="flex items-center gap-2 px-5 py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 rounded-xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors shadow-xs cursor-pointer active:scale-95"
+          >
+            <Download className="w-5 h-5" />
+            <span>تصدير JSON</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={fetchRules}
+            className="flex items-center gap-2 px-5 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl text-base font-bold text-slate-800 dark:text-slate-200 transition-colors shadow-xs cursor-pointer"
+          >
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>تحديث القواعد</span>
+          </button>
+        </div>
       </div>
+
+      <BotQaBulkImportModal
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
+        onSuccess={handleBulkSuccess}
+      />
 
       {statusMsg && (
         <div className="p-4 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-2xl text-sm font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
